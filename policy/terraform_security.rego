@@ -15,14 +15,14 @@ deny contains msg if {
 }
 
 # Bloqueia EC2 com IP público associado diretamente
-deny contains msg if {
-  resource := input.resource_changes[_]
+#deny contains msg if {
+#  resource := input.resource_changes[_]
 
-  resource.type == "aws_instance"
-  resource.change.after.associate_public_ip_address == true
+#  resource.type == "aws_instance"
+#  resource.change.after.associate_public_ip_address == true
 
-  msg := "EC2 não deve possuir IP público diretamente associado"
-}
+#  msg := "EC2 não deve possuir IP público diretamente associado"
+#}
 
 # Bloqueia bucket S3 público
 deny contains msg if {

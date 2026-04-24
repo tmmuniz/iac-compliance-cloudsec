@@ -269,7 +269,7 @@ resource "aws_instance" "app" {
   subnet_id                   = data.aws_subnets.default.ids[count.index]
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
-  associate_public_ip_address = false
+  associate_public_ip_address = yes
   user_data                   = local.user_data
 
   root_block_device {

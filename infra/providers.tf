@@ -7,6 +7,15 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  terraform {
+    backend "s3" {
+      bucket = "cloudsec-tf-state-tmmuniz"
+      key    = "terraform.tfstate"
+      region = "us-east-1"
+      encrypt = true
+    }
+  }
 }
 
 provider "aws" {
@@ -20,5 +29,5 @@ provider "aws" {
       Environment = var.environment
       Portfolio   = "Terraform-Rego-AWS-FreeTier"
     }
-  }
+  } 
 }
