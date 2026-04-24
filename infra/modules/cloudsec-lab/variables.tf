@@ -1,16 +1,24 @@
 variable "project_name" {
   description = "Nome base usado na identificação dos recursos."
   type        = string
+  default     = "cloudsec-free-tier"
 }
 
 variable "environment" {
   description = "Ambiente lógico do deploy."
   type        = string
+  default     = "dev"
 }
 
 variable "instance_type" {
   description = "Tipo da instância EC2 Free Tier elegível."
   type        = string
+}
+
+variable "owner" {
+  description = "Responsável pelo ambiente"
+  type        = string
+  default     = "cloudsec-team"
 }
 
 variable "allowed_public_ip_cidr" {
