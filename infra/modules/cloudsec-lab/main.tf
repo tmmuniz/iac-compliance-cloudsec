@@ -286,8 +286,8 @@ resource "aws_instance" "app" {
   }
 
   tags = {
-    Name = "${local.name_prefix}-ec2-${count.index + 1}"
-    Role = "web"
+    Name        = "${local.name_prefix}-ec2-${count.index + 1}"
+    Role        = "web"
     Environment = var.environment
     Project     = var.project_name
     Owner       = var.owner
