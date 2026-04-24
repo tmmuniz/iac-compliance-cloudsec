@@ -6,7 +6,7 @@
 
 terraform {
   backend "s3" {
-    bucket = "meu-bucket-terraform-state-unico"
+    bucket = "cloudsec-tf-state-tmmuniz"
     key    = "aws-terraform-rego-portfolio/terraform.tfstate"
     region = "us-east-1"
     encrypt = true
