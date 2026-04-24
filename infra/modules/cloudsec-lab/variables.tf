@@ -1,0 +1,30 @@
+variable "project_name" {
+  description = "Nome base usado na identificação dos recursos."
+  type        = string
+}
+
+variable "environment" {
+  description = "Ambiente lógico do deploy."
+  type        = string
+}
+
+variable "instance_type" {
+  description = "Tipo da instância EC2 Free Tier elegível."
+  type        = string
+}
+
+variable "allowed_public_ip_cidr" {
+  description = "CIDR público autorizado a acessar o ALB. Use x.x.x.x/32 para liberar somente seu IP."
+  type        = string
+}
+
+variable "ec2_instance_count" {
+  description = "Quantidade de instâncias EC2 atrás do ALB. Duas instâncias demonstram alta disponibilidade, mas consomem horas do Free Tier de forma acumulada."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.ec2_instance_count >= 1 && var.ec2_instance_count <= 2
+    error_message = "Para manter o laboratório controlado, use 1 ou 2 instâncias."
+  }
+}
