@@ -1,0 +1,51 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_destroy:
+        description: "Digite DESTROY para remover os recursos e evitar custos"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  # Configure em Settings > Secrets and variables > Actions > Variables.
+  # Exemplo: ALLOWED_PUBLIC_IP_CIDR=200.10.10.10/32
+  TF_VAR_allowed_public_ip_cidr: ${{ vars.ALLOWED_PUBLIC_IP_CIDR }}
+
+jobs:
+  destroy:
+    name: Destroy infrastructure
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.inputs.confirm_destroy == 'DESTROY' }}
+
+    defaults:
+      run:
+        working-directory: infra
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Configure AWS credentials with access key
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve
