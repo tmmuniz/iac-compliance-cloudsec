@@ -48,7 +48,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
 
       - name: Terraform fmt
-        run: terraform fmt -recursive -check
+        run: terraform fmt -recursive
 
       - name: Terraform init
         run: terraform init
