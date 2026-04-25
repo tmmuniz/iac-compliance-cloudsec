@@ -73,10 +73,18 @@ deny contains msg if {
 }
 
 # Exige tags obrigatórias apenas para EC2 e S3 Bucket
+is_required_tag_resource(resource) if {
+  resource.type == "aws_instance"
+}
+
+is_required_tag_resource(resource) if {
+  resource.type == "aws_s3_bucket"
+}
+
 deny contains msg if {
   resource := input.resource_changes[_]
 
-  resource.type == "aws_instance" or resource.type == "aws_s3_bucket"
+  is_required_tag_resource(resource)
 
   required := {"Environment", "Project", "Owner"}
 
