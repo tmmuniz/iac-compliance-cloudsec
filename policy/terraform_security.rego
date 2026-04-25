@@ -72,15 +72,23 @@ deny contains msg if {
   msg := "Bucket S3 deve possuir criptografia server-side configurada"
 }
 
-# Exige tags obrigatórias
+# Exige tags obrigatórias apenas para EC2 e S3 Bucket
 deny contains msg if {
   resource := input.resource_changes[_]
 
-  required := {"Environment", "Project", "Owner"}
-  tags := object.keys(resource.change.after.tags)
+  resource.type == "aws_instance" 
+  or resource.type == "aws_s3_bucket"
 
-  missing := required - {tag | tag := tags[_]}
+  required := {"Environment", "Project", "Owner"}
+
+  tags := object.get(resource.change.after, "tags", {})
+
+  missing := required - {tag | tags[tag]}
+
   count(missing) > 0
 
-  msg := sprintf("Recurso %s está sem tags obrigatórias: %v", [resource.address, missing])
+  msg := sprintf(
+    "Recurso %s está sem tags obrigatórias: %v",
+    [resource.address, missing]
+  )
 }
