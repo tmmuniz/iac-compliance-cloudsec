@@ -76,8 +76,7 @@ deny contains msg if {
 deny contains msg if {
   resource := input.resource_changes[_]
 
-  resource.type == "aws_instance" 
-  or resource.type == "aws_s3_bucket"
+  resource.type == "aws_instance" or resource.type == "aws_s3_bucket"
 
   required := {"Environment", "Project", "Owner"}
 
