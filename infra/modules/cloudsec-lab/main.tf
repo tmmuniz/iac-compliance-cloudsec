@@ -78,6 +78,13 @@ locals {
 resource "aws_s3_bucket" "app_data" {
   bucket        = local.bucket_name
   force_destroy = true
+
+  tags = {
+    Name        = "cloudsec-app-data"
+    Environment = var.environment
+    Project     = var.project_name
+    Owner       = var.owner
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "app_data" {
