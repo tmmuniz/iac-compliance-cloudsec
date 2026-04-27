@@ -7,4 +7,5 @@ module "cloudsec_lab" {
   allowed_public_ip_cidr = var.allowed_public_ip_cidr
   ec2_instance_count     = var.ec2_instance_count
   prowler_reports_bucket_name = var.prowler_reports_bucket_name
+  github_repository           = var.github_repository
 }

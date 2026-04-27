@@ -47,3 +47,8 @@ variable "prowler_reports_bucket_name" {
   description = "Nome do bucket S3 para relatórios do Prowler"
   type        = string
 }
+
+variable "github_repository" {
+  description = "Repositório GitHub autorizado no OIDC. Exemplo: usuario/repositorio"
+  type        = string
+}
