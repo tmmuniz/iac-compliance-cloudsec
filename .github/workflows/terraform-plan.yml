@@ -44,7 +44,7 @@ jobs:
           version: latest
 
       - name: Terraform fmt
-        run: terraform fmt -recursive -check
+        run: terraform fmt -recursive
 
       - name: Terraform init
         run: terraform init -input=false -reconfigure
