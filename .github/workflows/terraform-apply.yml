@@ -91,7 +91,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.ARN_OIDC_PROWLER_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
-          PROWLER_REPORTS_BUCKET: ${{ vars.PROWLER_REPORTS_BUCKET }}
+          PROWLER_REPORTS_BUCKET: ${{ env.PROWLER_REPORTS_BUCKET }}
 
       - name: Install Prowler
         run: pipx install prowler
