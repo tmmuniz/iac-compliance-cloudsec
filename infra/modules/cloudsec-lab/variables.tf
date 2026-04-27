@@ -46,3 +46,9 @@ variable "github_repository" {
   description = "Repositório GitHub autorizado no OIDC. Exemplo: usuario/repositorio"
   type        = string
 }
+
+variable "prowler_role_name" {
+  description = "Nome da role IAM criada manualmente para o Prowler"
+  type        = string
+  default     = "github-actions-prowler-role"
+}
