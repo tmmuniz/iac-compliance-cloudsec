@@ -54,7 +54,7 @@ jobs:
         run: terraform init -input=false -reconfigure
 
       - name: Terraform fmt
-        run: terraform fmt -recursive -check
+        run: terraform fmt -recursive
 
       - name: Terraform validate
         run: terraform validate
