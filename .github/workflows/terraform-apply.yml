@@ -10,11 +10,11 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
-  # Configure em Settings > Secrets and variables > Actions > Variables.
-  # Exemplo: ALLOWED_PUBLIC_IP_CIDR=200.10.10.10/32
   TF_VAR_allowed_public_ip_cidr: ${{ vars.ALLOWED_PUBLIC_IP_CIDR }}
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
 
 jobs:
   apply:
@@ -31,6 +31,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::362552859209:role/github-actions-terraform-role
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -41,15 +47,14 @@ jobs:
         with:
           version: latest
 
-      - name: Configure AWS credentials with access key
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
-
       - name: Terraform init
-        run: terraform init
+        run: terraform init -input=false -reconfigure
+
+      - name: Terraform fmt
+        run: terraform fmt -recursive -check
+
+      - name: Terraform validate
+        run: terraform validate
 
       - name: Terraform plan
         run: terraform plan -out=tfplan.binary
