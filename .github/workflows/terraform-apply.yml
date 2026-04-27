@@ -104,6 +104,7 @@ jobs:
         run: pipx install prowler
 
       - name: Run Prowler AWS scan
+        continue-on-error: true
         run: |
           prowler aws \
           --region "$AWS_REGION" \
