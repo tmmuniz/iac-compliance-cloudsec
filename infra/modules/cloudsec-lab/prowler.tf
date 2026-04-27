@@ -1,8 +1,3 @@
-variable "prowler_reports_bucket_name" {
-  description = "Nome do bucket S3 privado para armazenar relatórios do Prowler"
-  type        = string
-}
-
 locals {
   prowler_role_name = "github-actions-prowler-role"
 }
