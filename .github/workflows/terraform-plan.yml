@@ -13,6 +13,9 @@ permissions:
 env:
   TF_VAR_allowed_public_ip_cidr: ${{ vars.ALLOWED_PUBLIC_IP_CIDR }}
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  TF_VAR_prowler_reports_bucket_name: ${{ vars.PROWLER_REPORTS_BUCKET }}
+  TF_VAR_github_repository: ${{ github.repository }}
+  PROWLER_REPORTS_BUCKET: ${{ vars.PROWLER_REPORTS_BUCKET }}
 
 jobs:
   plan:
