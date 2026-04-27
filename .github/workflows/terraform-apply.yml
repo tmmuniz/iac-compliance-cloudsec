@@ -106,9 +106,9 @@ jobs:
       - name: Run Prowler AWS scan
         run: |
           prowler aws \
-            --region "$AWS_REGION" \
-            --output-formats html json \
-            --output-directory prowler-output
+          --region "$AWS_REGION" \
+          --output-formats html \
+          --output-directory prowler-output
 
       - name: Upload Prowler HTML report to private S3 bucket
         run: |
