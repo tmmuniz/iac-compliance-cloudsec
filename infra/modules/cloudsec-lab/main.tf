@@ -161,11 +161,11 @@ resource "aws_iam_policy" "ec2_s3_access" {
   })
 }
 
-resource "aws_iam_policy" "ec2_s3_access" {
-  name        = "${local.name_prefix}-ec2-s3-access"
-  description = "Permite que as EC2 acessem somente o bucket S3 do projeto."
-  policy      = data.aws_iam_policy_document.ec2_s3_access.json
-}
+#resource "aws_iam_policy" "ec2_s3_access" {
+#  name        = "${local.name_prefix}-ec2-s3-access"
+#  description = "Permite que as EC2 acessem somente o bucket S3 do projeto."
+#  policy      = data.aws_iam_policy_document.ec2_s3_access.json
+#}
 
 resource "aws_iam_role_policy_attachment" "ec2_s3_access" {
   role       = aws_iam_role.ec2_s3_role.name
@@ -289,7 +289,7 @@ resource "aws_instance" "app" {
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
   associate_public_ip_address = true
-  user_data                   = local.user_data
+  #user_data                   = local.user_data
 
   root_block_device {
     volume_type           = "gp3"
