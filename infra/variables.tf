@@ -42,3 +42,8 @@ variable "ec2_instance_count" {
   type        = number
   default     = 2
 }
+
+variable "prowler_reports_bucket_name" {
+  description = "Nome do bucket S3 para relatórios do Prowler"
+  type        = string
+}

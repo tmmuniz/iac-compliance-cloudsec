@@ -36,3 +36,4 @@ variable "ec2_instance_count" {
     error_message = "Para manter o laboratório controlado, use 1 ou 2 instâncias."
   }
 }
+

@@ -126,27 +126,39 @@ resource "aws_iam_role" "ec2_s3_role" {
 }
 
 # Política de menor privilégio para o bucket do projeto.
-data "aws_iam_policy_document" "ec2_s3_access" {
-  statement {
-    sid     = "ListProjectBucket"
-    effect  = "Allow"
-    actions = ["s3:ListBucket"]
+resource "aws_iam_policy" "ec2_s3_access" {
+  name = "${var.project_name}-${var.environment}-ec2-s3-access"
 
-    resources = [aws_s3_bucket.app_data.arn]
-  }
-
-  statement {
-    sid    = "ReadWriteObjectsInProjectBucket"
-    effect = "Allow"
-
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowAppBucketAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.app_data.arn,
+          "${aws_s3_bucket.app_data.arn}/*"
+        ]
+      },
+      {
+        Sid    = "AllowReadProwlerReports"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject"
+        ]
+        Resource = "${aws_s3_bucket.prowler_reports.arn}/prowler/*"
+      }
     ]
+  })
 
-    resources = ["${aws_s3_bucket.app_data.arn}/*"]
-  }
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-${var.environment}-ec2-s3-access"
+  })
 }
 
 resource "aws_iam_policy" "ec2_s3_access" {
@@ -299,6 +311,12 @@ resource "aws_instance" "app" {
     Project     = var.project_name
     Owner       = var.owner
   }
+
+  user_data = templatefile("${path.module}/user_data.sh", {
+    instance_name       = "cloudsec-app-${count.index + 1}"
+    bucket_name         = aws_s3_bucket.app_data.bucket
+    prowler_bucket_name = aws_s3_bucket.prowler_reports.bucket
+  })
 }
 
 resource "aws_lb_target_group_attachment" "app" {
