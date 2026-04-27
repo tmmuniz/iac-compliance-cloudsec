@@ -10,10 +10,9 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
-  # Configure em Settings > Secrets and variables > Actions > Variables.
-  # Exemplo: ALLOWED_PUBLIC_IP_CIDR=200.10.10.10/32
   TF_VAR_allowed_public_ip_cidr: ${{ vars.ALLOWED_PUBLIC_IP_CIDR }}
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
   TF_VAR_prowler_reports_bucket_name: ${{ vars.PROWLER_REPORTS_BUCKET }}
@@ -35,16 +34,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.ARN_OIDC_TERRAFORM_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.8.5
-
-      - name: Configure AWS credentials with access key
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.ARN_OIDC_TERRAFORM_ROLE }}
-          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
 
       - name: Terraform init
         run: terraform init
