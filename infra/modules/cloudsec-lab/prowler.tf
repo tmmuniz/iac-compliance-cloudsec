@@ -61,6 +61,6 @@ resource "aws_iam_policy" "prowler_report_writer" {
 }
 
 resource "aws_iam_role_policy_attachment" "prowler_report_writer_attach" {
-  role       = aws_iam_role.github_actions_prowler_role.name
+  role       = role = var.prowler_role_name
   policy_arn = aws_iam_policy.prowler_report_writer.arn
 }
