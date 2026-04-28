@@ -53,7 +53,7 @@ variable "prowler_reports_bucket_name" {
 variable "github_repository" {
   description = "Repositório GitHub autorizado no OIDC. Exemplo: usuario/repositorio"
   type        = string
-  default     =  "tmmuniz/iac-compliance-cloudsec"
+  default     = "tmmuniz/iac-compliance-cloudsec"
 }
 
 variable "ssh_public_key" {

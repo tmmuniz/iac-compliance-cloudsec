@@ -24,7 +24,7 @@ variable "owner" {
 variable "allowed_public_ip_cidr" {
   description = "CIDR público autorizado a acessar o ALB. Use x.x.x.x/32 para liberar somente seu IP."
   type        = string
-  default = "187.122.60.165/32"
+  default     = "187.122.60.165/32"
 }
 
 variable "ec2_instance_count" {
@@ -41,13 +41,13 @@ variable "ec2_instance_count" {
 variable "prowler_reports_bucket_name" {
   description = "Nome do bucket do Prowler"
   type        = string
-  default = "cloudsec-tmmuniz-prowler-bucket"
+  default     = "cloudsec-tmmuniz-prowler-bucket"
 }
 
 variable "github_repository" {
   description = "Repositório GitHub autorizado no OIDC. Exemplo: usuario/repositorio"
   type        = string
-  default = "tmmuniz/iac-compliance-cloudsec"
+  default     = "tmmuniz/iac-compliance-cloudsec"
 }
 
 variable "prowler_role_name" {

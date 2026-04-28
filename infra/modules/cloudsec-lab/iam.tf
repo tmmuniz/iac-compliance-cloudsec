@@ -1,40 +1,58 @@
-locals {
-  prowler_role_name = "github-actions-prowler-role"
+# Role assumida pelas instâncias EC2. Evita credenciais hardcoded em user-data, código ou arquivos.
+data "aws_iam_policy_document" "ec2_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
 }
 
-resource "aws_s3_bucket" "prowler_reports" {
-  bucket = var.prowler_reports_bucket_name
+resource "aws_iam_role" "ec2_s3_role" {
+  name               = "${local.name_prefix}-ec2-s3-role"
+  assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
+}
+
+# Política de menor privilégio para o bucket do projeto.
+resource "aws_iam_policy" "ec2_s3_access" {
+  name = "${var.project_name}-${var.environment}-ec2-s3-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowAppBucketAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.app_data.arn,
+          "${aws_s3_bucket.app_data.arn}/*"
+        ]
+      }
+    ]
+  })
 
   tags = merge(local.common_tags, {
-    Name = var.prowler_reports_bucket_name
+    Name = "${var.project_name}-${var.environment}-ec2-s3-access"
   })
 }
 
-resource "aws_s3_bucket_public_access_block" "prowler_reports" {
-  bucket = aws_s3_bucket.prowler_reports.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+resource "aws_iam_role_policy_attachment" "ec2_s3_access" {
+  role       = aws_iam_role.ec2_s3_role.name
+  policy_arn = aws_iam_policy.ec2_s3_access.arn
 }
 
-resource "aws_s3_bucket_versioning" "prowler_reports" {
-  bucket = aws_s3_bucket.prowler_reports.id
-
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "prowler_reports" {
-  bucket = aws_s3_bucket.prowler_reports.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "${local.name_prefix}-ec2-profile"
+  role = aws_iam_role.ec2_s3_role.name
 }
 
 
@@ -112,26 +130,4 @@ data "aws_iam_policy_document" "prowler_reports_bucket_policy" {
 resource "aws_s3_bucket_policy" "prowler_reports" {
   bucket = aws_s3_bucket.prowler_reports.id
   policy = data.aws_iam_policy_document.prowler_reports_bucket_policy.json
-}
-
-resource "aws_cloudtrail" "cloudsec_management_events" {
-  name                          = "${var.project_name}-${var.environment}-cloudtrail"
-  s3_bucket_name                = aws_s3_bucket.prowler_reports.bucket
-  s3_key_prefix                 = "cloudtrail"
-  include_global_service_events = true
-  is_multi_region_trail         = false
-  enable_log_file_validation    = true
-
-  event_selector {
-    read_write_type           = "All"
-    include_management_events = true
-  }
-
-  depends_on = [
-    aws_s3_bucket_policy.prowler_reports
-  ]
-
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-${var.environment}-cloudtrail"
-  })
 }
