@@ -112,14 +112,6 @@ resource "aws_iam_policy" "ec2_s3_access" {
           aws_s3_bucket.app_data.arn,
           "${aws_s3_bucket.app_data.arn}/*"
         ]
-      },
-      {
-        Sid    = "AllowReadProwlerReports"
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject"
-        ]
-        Resource = "${aws_s3_bucket.prowler_reports.arn}/prowler/*"
       }
     ]
   })
@@ -128,12 +120,6 @@ resource "aws_iam_policy" "ec2_s3_access" {
     Name = "${var.project_name}-${var.environment}-ec2-s3-access"
   })
 }
-
-#resource "aws_iam_policy" "ec2_s3_access" {
-#  name        = "${local.name_prefix}-ec2-s3-access"
-#  description = "Permite que as EC2 acessem somente o bucket S3 do projeto."
-#  policy      = data.aws_iam_policy_document.ec2_s3_access.json
-#}
 
 resource "aws_iam_role_policy_attachment" "ec2_s3_access" {
   role       = aws_iam_role.ec2_s3_role.name
@@ -283,7 +269,6 @@ resource "aws_instance" "app" {
   user_data = templatefile("${path.module}/user_data.sh", {
     instance_name       = "cloudsec-app-${count.index + 1}"
     bucket_name         = aws_s3_bucket.app_data.bucket
-    prowler_bucket_name = aws_s3_bucket.prowler_reports.bucket
   })
 }
 
