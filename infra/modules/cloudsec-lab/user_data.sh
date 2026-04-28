@@ -12,17 +12,17 @@ APP_BUCKET="${bucket_name}"
 systemctl enable nginx
 systemctl start nginx
 
-TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
-  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+#TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+#  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
-  http://169.254.169.254/latest/meta-data/instance-id)
+#INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+#  http://169.254.169.254/latest/meta-data/instance-id)
 
-AVAILABILITY_ZONE=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
-  http://169.254.169.254/latest/meta-data/placement/availability-zone)
+#AVAILABILITY_ZONE=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+#  http://169.254.169.254/latest/meta-data/placement/availability-zone)
 
-LOCAL_IPV4=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
-  http://169.254.169.254/latest/meta-data/local-ipv4)
+#LOCAL_IPV4=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+#  http://169.254.169.254/latest/meta-data/local-ipv4)
 
 HOSTNAME=$(hostname)
 
