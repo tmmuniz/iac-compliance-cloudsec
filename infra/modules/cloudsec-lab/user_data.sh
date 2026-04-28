@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 dnf update -y
 dnf install -y nginx awscli
@@ -6,22 +7,69 @@ dnf install -y nginx awscli
 systemctl enable nginx
 systemctl start nginx
 
-INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-AVAILABILITY_ZONE=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
-LOCAL_IPV4=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+APP_BUCKET="${bucket_name}"
+
+# IMDSv2 - acesso seguro aos metadados da EC2
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/instance-id)
+
+AVAILABILITY_ZONE=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/placement/availability-zone)
+
+LOCAL_IPV4=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/local-ipv4)
+
 HOSTNAME=$(hostname)
 
 mkdir -p /usr/share/nginx/html/app-data
 
+# Hardening básico do Nginx para ambiente HTTP restrito pelo ALB
+cat > /etc/nginx/conf.d/cloudsec.conf <<'EOF'
+server_tokens off;
+
+server {
+    listen 80 default_server;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "no-referrer" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+    add_header Cache-Control "no-store" always;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /app-data/ {
+        autoindex off;
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
+
 cat > /usr/local/bin/write-and-read-app-bucket.sh <<'EOF'
 #!/bin/bash
+set -euo pipefail
 
 APP_BUCKET="${bucket_name}"
 OUTPUT_DIR="/usr/share/nginx/html/app-data"
-INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/instance-id)
+
 HOSTNAME=$(hostname)
 NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-OBJECT_KEY="ec2-writes/$${INSTANCE_ID}.txt"
+OBJECT_KEY="ec2-writes/$INSTANCE_ID-output.txt"
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -34,7 +82,6 @@ Bucket: $APP_BUCKET
 EOT
 
 aws s3 cp /tmp/ec2-app-write.txt "s3://$APP_BUCKET/$OBJECT_KEY"
-
 aws s3 ls "s3://$APP_BUCKET/ec2-writes/" > "$OUTPUT_DIR/objects.txt" || true
 
 cat > "$OUTPUT_DIR/index.html" <<EOT
@@ -45,34 +92,32 @@ cat > "$OUTPUT_DIR/index.html" <<EOT
   <body>
     <h1>Leitura do bucket da aplicação</h1>
 
-    <p>Esta página mostra evidência de escrita e leitura no bucket S3 privado da aplicação.</p>
+    <p>Esta página demonstra escrita e leitura no bucket privado da aplicação usando a IAM Role da EC2.</p>
 
     <ul>
       <li><strong>Bucket:</strong> $APP_BUCKET</li>
-      <li><strong>Última instância que atualizou:</strong> $INSTANCE_ID</li>
+      <li><strong>Instância:</strong> $INSTANCE_ID</li>
       <li><strong>Hostname:</strong> $HOSTNAME</li>
       <li><strong>Última atualização UTC:</strong> $NOW</li>
     </ul>
 
-    <h2>Objetos em s3://$APP_BUCKET/ec2-writes/</h2>
-    <pre>
-$(cat "$OUTPUT_DIR/objects.txt")
-    </pre>
+    <h2>Objetos encontrados em ec2-writes/</h2>
+    <pre>$(cat "$OUTPUT_DIR/objects.txt")</pre>
 
-    <h2>Conteúdo escrito por esta instância</h2>
-    <pre>
-$(cat /tmp/ec2-app-write.txt)
-    </pre>
+    <h2>Último conteúdo escrito por esta instância</h2>
+    <pre>$(cat /tmp/ec2-app-write.txt)</pre>
 
     <p><a href="/">Voltar</a></p>
   </body>
 </html>
 EOT
+
+rm -f /tmp/ec2-app-write.txt
 EOF
 
-chmod +x /usr/local/bin/write-and-read-app-bucket.sh
+chmod 750 /usr/local/bin/write-and-read-app-bucket.sh
 
-cat > /etc/cron.d/write-and-read-app-bucket <<EOF
+cat > /etc/cron.d/write-and-read-app-bucket <<'EOF'
 */5 * * * * root /usr/local/bin/write-and-read-app-bucket.sh
 EOF
 
@@ -84,10 +129,9 @@ cat > /usr/share/nginx/html/index.html <<EOF
   <body>
     <h1>CloudSec Free Tier Lab</h1>
 
-    <p>Ambiente com ALB em modo ativo-ativo.</p>
+    <p>Ambiente criado com Terraform, Rego, tfsec, Prowler, CloudTrail, EC2, ALB, IAM e S3.</p>
 
-    <h2>Instância que respondeu esta conexão</h2>
-
+    <h2>Instância atual</h2>
     <ul>
       <li><strong>Instance ID:</strong> $INSTANCE_ID</li>
       <li><strong>Hostname:</strong> $HOSTNAME</li>
@@ -95,23 +139,28 @@ cat > /usr/share/nginx/html/index.html <<EOF
       <li><strong>Availability Zone:</strong> $AVAILABILITY_ZONE</li>
     </ul>
 
-    <h2>Integrações de Segurança</h2>
-
+    <h2>Controles aplicados</h2>
     <ul>
-      <li>Bucket do Prowler privado, sem leitura pela EC2.</li>
-      <li>CloudTrail gravando logs em uma pasta <code>cloudtrail/</code> no bucket privado do Prowler.</li>
-      <li>EC2 escreve e lê objetos no bucket privado da aplicação.</li>
+      <li>IMDSv2 utilizado para acesso seguro aos metadados da EC2.</li>
+      <li>Bucket do Prowler privado, sem permissão de leitura pela EC2.</li>
+      <li>CloudTrail gravando logs em uma pasta separada no bucket do Prowler.</li>
+      <li>EC2 escreve e lê apenas no bucket privado da aplicação.</li>
+      <li>Nginx com headers básicos de segurança.</li>
+      <li>Acesso HTTP restrito pelo Security Group do ALB ao IP autorizado.</li>
     </ul>
 
     <p>
       <a href="/app-data/index.html">Ver dados escritos no bucket da aplicação</a>
     </p>
-
-    <p>Atualize a página algumas vezes para observar o balanceamento entre as instâncias.</p>
   </body>
 </html>
 EOF
 
 /usr/local/bin/write-and-read-app-bucket.sh
 
+chown -R root:nginx /usr/share/nginx/html
+find /usr/share/nginx/html -type d -exec chmod 750 {} \;
+find /usr/share/nginx/html -type f -exec chmod 640 {} \;
+
+nginx -t
 systemctl restart nginx
