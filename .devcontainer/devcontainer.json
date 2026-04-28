@@ -1,0 +1,8 @@
+{
+  "name": "Meu Projeto Terraform",
+  "features": {
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "latest"
+    }
+  }
+}

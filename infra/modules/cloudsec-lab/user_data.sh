@@ -4,12 +4,14 @@ set -euo pipefail
 dnf update -y
 dnf install -y nginx awscli
 
-systemctl enable nginx
-systemctl start nginx
+rm -f /usr/share/nginx/html/index.html
+rm -f /etc/nginx/conf.d/default.conf
 
 APP_BUCKET="${bucket_name}"
 
-# IMDSv2 - acesso seguro aos metadados da EC2
+systemctl enable nginx
+systemctl start nginx
+
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
   -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
@@ -26,16 +28,15 @@ HOSTNAME=$(hostname)
 
 mkdir -p /usr/share/nginx/html/app-data
 
-# Hardening básico do Nginx para ambiente HTTP restrito pelo ALB
 cat > /etc/nginx/conf.d/cloudsec.conf <<'EOF'
-server_tokens off;
-
 server {
     listen 80 default_server;
     server_name _;
 
     root /usr/share/nginx/html;
     index index.html;
+
+    server_tokens off;
 
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-Frame-Options "DENY" always;
@@ -44,7 +45,7 @@ server {
     add_header Cache-Control "no-store" always;
 
     location / {
-        try_files $uri $uri/ =404;
+        try_files /index.html =404;
     }
 
     location /app-data/ {
@@ -82,6 +83,7 @@ Bucket: $APP_BUCKET
 EOT
 
 aws s3 cp /tmp/ec2-app-write.txt "s3://$APP_BUCKET/$OBJECT_KEY"
+
 aws s3 ls "s3://$APP_BUCKET/ec2-writes/" > "$OUTPUT_DIR/objects.txt" || true
 
 cat > "$OUTPUT_DIR/index.html" <<EOT
