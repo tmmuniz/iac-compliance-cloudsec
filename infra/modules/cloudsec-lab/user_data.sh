@@ -21,7 +21,7 @@ OUTPUT_DIR="/usr/share/nginx/html/app-data"
 INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 HOSTNAME=$(hostname)
 NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-OBJECT_KEY="ec2-writes/${INSTANCE_ID}.txt"
+OBJECT_KEY="ec2-writes/$${INSTANCE_ID}.txt"
 
 mkdir -p "$OUTPUT_DIR"
 
