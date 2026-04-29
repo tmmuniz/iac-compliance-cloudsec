@@ -39,9 +39,9 @@ variable "ec2_instance_count" {
 }
 
 variable "adm_bucket_name" {
-  description = "Nome do bucket do Prowler"
+  description = "Nome do bucket ADM"
   type        = string
-  default     = "cloudsec-tmmuniz-prowler-bucket"
+  default     = "cloudsec-tmmuniz-adm-bucket"
 }
 
 variable "github_repository" {
@@ -50,10 +50,10 @@ variable "github_repository" {
   default     = "tmmuniz/iac-compliance-cloudsec"
 }
 
-variable "prowler_role_name" {
+variable "adm_role_name" {
   description = "Nome da role IAM criada manualmente para o Prowler"
   type        = string
-  default     = "github-actions-prowler-role"
+  default     = "github-actions-adm-role"
 }
 
 variable "ssh_public_key" {

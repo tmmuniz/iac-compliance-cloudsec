@@ -47,7 +47,7 @@ variable "ec2_instance_count" {
 variable "adm_bucket_name" {
   description = "Nome do bucket S3 para relatórios do Prowler e Logs Cloudtrail"
   type        = string
-  default     = "cloudsec-tmmuniz-prowler-bucket"
+  default     = "cloudsec-tmmuniz-adm-bucket"
 }
 
 variable "github_repository" {

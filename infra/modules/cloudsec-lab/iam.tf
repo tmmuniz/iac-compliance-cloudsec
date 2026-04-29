@@ -17,7 +17,7 @@ resource "aws_iam_role" "ec2_s3_role" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
 }
 
-# Política de menor privilégio para o bucket do projeto.
+# Política de menor privilégio para o bucket da aplicacao.
 resource "aws_iam_policy" "ec2_s3_access" {
   name = "${var.project_name}-${var.environment}-ec2-s3-access"
 
@@ -55,7 +55,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   role = aws_iam_role.ec2_s3_role.name
 }
 
-
+# Permissao para o Prowler escrever no Bucket ADM
 resource "aws_iam_policy" "prowler_report_writer" {
   name = "prowler-report-writer"
 
@@ -79,11 +79,11 @@ resource "aws_iam_policy" "prowler_report_writer" {
 }
 
 resource "aws_iam_role_policy_attachment" "prowler_report_writer_attach" {
-  role       = var.prowler_role_name
+  role       = var.adm_role_name
   policy_arn = aws_iam_policy.prowler_report_writer.arn
 }
 
-data "aws_iam_policy_document" "admbucket_policy" {
+data "aws_iam_policy_document" "adm_bucket_policy" {
   statement {
     sid    = "AWSCloudTrailAclCheck"
     effect = "Allow"
@@ -129,5 +129,5 @@ data "aws_iam_policy_document" "admbucket_policy" {
 
 resource "aws_s3_bucket_policy" "adm_reports" {
   bucket = aws_s3_bucket.adm_reports.id
-  policy = data.aws_iam_policy_document.admbucket_policy.json
+  policy = data.aws_iam_policy_document.adm_bucket_policy.json
 }

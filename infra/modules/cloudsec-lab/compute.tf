@@ -1,4 +1,4 @@
-# AMI Amazon Linux 2023 mais recente, sem custo adicional pela AMI.
+# AMI Amazon Linux 2023 minimal, sem custo adicional pela AMI.
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
@@ -14,7 +14,7 @@ data "aws_ami" "amazon_linux" {
   }
 }
 
-# Duas instâncias em subnets diferentes. Importante: duas EC2 consomem horas acumuladas do Free Tier.
+# Duas instâncias em subnets diferentes
 resource "aws_instance" "app" {
   count = var.ec2_instance_count
 
@@ -47,6 +47,7 @@ resource "aws_instance" "app" {
     Owner       = var.owner
   }
 
+  # Utilize o arquivo user_data.sh na inicializacao da instancia
   user_data = templatefile("${path.module}/user_data.sh", {
     instance_name = "cloudsec-app-${count.index + 1}"
     bucket_name   = aws_s3_bucket.app_data.bucket

@@ -1,3 +1,4 @@
+# Bucket S3 privado onde o Prowler e Cloudtrail farao a escrita
 resource "aws_s3_bucket" "adm_reports" {
   bucket = var.adm_bucket_name
 
@@ -34,7 +35,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "adm_reports" {
 }
 
 
-# Bucket S3 privado do laboratório.
+# Bucket S3 privado onde as instancias farao escrita a leitura.
 resource "aws_s3_bucket" "app_data" {
   bucket        = local.bucket_name
   force_destroy = true
