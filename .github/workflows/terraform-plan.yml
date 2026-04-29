@@ -16,6 +16,7 @@ env:
   TF_VAR_adm_bucket_name: ${{ vars.ADM_BUCKET_NAME }}
   TF_VAR_github_repository: ${{ github.repository }}
   ADM_BUCKET_NAME: ${{ vars.ADM_BUCKET_NAME }}
+  TF_VAR_ssh_public_key: ${{ vars.SSH_PUB_KEY }}
 
 jobs:
   plan:
