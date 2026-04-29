@@ -30,7 +30,6 @@ variable "instance_type" {
 variable "allowed_public_ip_cidr" {
   description = "IP público/CIDR autorizado a acessar o ALB. Recomendado: x.x.x.x/32. Exemplo: 200.10.10.10/32."
   type        = string
-  default     = "187.122.60.165/32"
 
   validation {
     condition     = can(cidrhost(var.allowed_public_ip_cidr, 0)) && var.allowed_public_ip_cidr != "0.0.0.0/0"
@@ -59,4 +58,16 @@ variable "github_repository" {
 variable "ssh_public_key" {
   description = "Chave pública SSH para acesso às instâncias"
   type        = string
+}
+
+variable "enable_ssh_access" {
+  description = "Habilita acesso SSH às EC2 a partir do CIDR autorizado."
+  type        = bool
+  default     = false
+}
+
+variable "force_destroy_buckets" {
+  description = "Permite destruir buckets mesmo com objetos. Use true apenas em laboratório."
+  type        = bool
+  default     = false
 }

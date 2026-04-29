@@ -35,12 +35,16 @@ resource "aws_security_group" "ec2" {
     security_groups = [aws_security_group.alb.id]
   }
 
-  ingress {
-    description = "SSH access from allowed IP"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.allowed_public_ip_cidr]
+  dynamic "ingress" {
+    for_each = var.enable_ssh_access ? [1] : []
+
+    content {
+      description = "SSH access from allowed IP"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = [var.allowed_public_ip_cidr]
+    }
   }
 
   egress {

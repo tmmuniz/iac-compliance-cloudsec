@@ -38,7 +38,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "adm_reports" {
 # Bucket S3 privado onde as instancias farao escrita a leitura.
 resource "aws_s3_bucket" "app_data" {
   bucket        = local.bucket_name
-  force_destroy = true
+  force_destroy = var.force_destroy_buckets
 
   tags = {
     Name        = "cloudsec-app-data"
@@ -57,12 +57,38 @@ resource "aws_s3_bucket_public_access_block" "app_data" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_versioning" "app_data" {
+  bucket = aws_s3_bucket.app_data.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "app_data" {
   bucket = aws_s3_bucket.app_data.id
 
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "adm_reports" {
+  bucket = aws_s3_bucket.adm_reports.id
+
+  rule {
+    id     = "expire-cloudtrail-logs"
+    status = "Enabled"
+
+    filter {
+      prefix = "cloudtrail/"
+    }
+
+    # Periodo curto, apenas para demonstracao
+    expiration {
+      days = 3
     }
   }
 }

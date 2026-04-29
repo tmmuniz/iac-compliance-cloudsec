@@ -8,5 +8,7 @@ module "cloudsec_lab" {
   ec2_instance_count          = var.ec2_instance_count
   adm_bucket_name = var.adm_bucket_name
   github_repository           = var.github_repository
+  enable_ssh_access           = var.enable_ssh_access
+  force_destroy_buckets       = var.force_destroy_buckets
   ssh_public_key              = var.ssh_public_key
 }

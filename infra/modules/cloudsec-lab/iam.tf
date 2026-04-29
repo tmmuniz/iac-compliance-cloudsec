@@ -25,17 +25,21 @@ resource "aws_iam_policy" "ec2_s3_access" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowAppBucketAccess"
+        Sid    = "AllowListAppBucket"
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = aws_s3_bucket.app_data.arn
+      },
+      {
+        Sid    = "AllowReadWriteOnlyEc2WritesPrefix"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
+          "s3:PutObject"
         ]
-        Resource = [
-          aws_s3_bucket.app_data.arn,
-          "${aws_s3_bucket.app_data.arn}/*"
-        ]
+        Resource = "${aws_s3_bucket.app_data.arn}/ec2-writes/*"
       }
     ]
   })
@@ -57,7 +61,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 
 # Permissao para o Prowler escrever no Bucket ADM
 resource "aws_iam_policy" "prowler_report_writer" {
-  name = "prowler-report-writer"
+  name = "${local.name_prefix}-prowler-report-writer"
 
   policy = jsonencode({
     Version = "2012-10-17"

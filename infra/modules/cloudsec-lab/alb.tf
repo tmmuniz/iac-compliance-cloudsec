@@ -7,6 +7,10 @@ resource "aws_lb" "app" {
   subnets            = slice(data.aws_subnets.default.ids, 0, 2)
 
   enable_deletion_protection = false
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-alb"
+  })
 }
 
 resource "aws_lb_target_group" "app" {
@@ -24,6 +28,14 @@ resource "aws_lb_target_group" "app" {
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-tg"
+  })
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

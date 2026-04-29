@@ -24,7 +24,6 @@ variable "owner" {
 variable "allowed_public_ip_cidr" {
   description = "CIDR público autorizado a acessar o ALB. Use x.x.x.x/32 para liberar somente seu IP."
   type        = string
-  default     = "187.122.60.165/32"
 }
 
 variable "ec2_instance_count" {
@@ -59,4 +58,16 @@ variable "adm_role_name" {
 variable "ssh_public_key" {
   description = "Chave pública SSH para acesso às instâncias"
   type        = string
+}
+
+variable "enable_ssh_access" {
+  description = "Habilita acesso SSH às EC2 a partir do CIDR autorizado."
+  type        = bool
+  default     = false
+}
+
+variable "force_destroy_buckets" {
+  description = "Permite destruir buckets mesmo com objetos."
+  type        = bool
+  default     = false
 }
