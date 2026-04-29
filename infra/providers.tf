@@ -13,7 +13,9 @@ terraform {
     key          = "terraform.tfstate"
     region       = "us-east-1"
     encrypt      = true
-    use_lockfile = true
+
+    # Disable because of free tier
+    #dynamodb_table = "cloudsec-tf-lock" 
   }
 }
 
