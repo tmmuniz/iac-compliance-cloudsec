@@ -38,7 +38,7 @@ variable "ec2_instance_count" {
   }
 }
 
-variable "prowler_reports_bucket_name" {
+variable "adm_bucket_name" {
   description = "Nome do bucket do Prowler"
   type        = string
   default     = "cloudsec-tmmuniz-prowler-bucket"

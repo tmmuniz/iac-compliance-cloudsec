@@ -13,11 +13,11 @@ permissions:
   id-token: write
 
 env:
-  TF_VAR_allowed_public_ip_cidr: ${{ vars.ALLOWED_PUBLIC_IP_CIDR }}
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
-  TF_VAR_prowler_reports_bucket_name: ${{ vars.PROWLER_REPORTS_BUCKET }}
+  ADM_BUCKET_NAME: ${{ vars.ADM_BUCKET_NAME }}
+  TF_VAR_allowed_public_ip_cidr: ${{ vars.ALLOWED_PUBLIC_IP_CIDR }}
+  TF_VAR_adm_bucket_name: ${{ vars.ADM_BUCKET_NAME }}
   TF_VAR_github_repository: ${{ github.repository }}
-  PROWLER_REPORTS_BUCKET: ${{ vars.PROWLER_REPORTS_BUCKET }}
 
 jobs:
   apply:
@@ -89,7 +89,7 @@ jobs:
 
     env:
       AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
-      PROWLER_REPORTS_BUCKET: ${{ vars.PROWLER_REPORTS_BUCKET }}
+      ADM_BUCKET_NAME: ${{ vars.ADM_BUCKET_NAME }}
 
     steps:
       - name: Checkout repository
@@ -114,10 +114,12 @@ jobs:
 
       - name: Upload Prowler HTML report to private S3 bucket
         run: |
-          echo "Bucket: $PROWLER_REPORTS_BUCKET"
+          echo "Bucket: $ADM_BUCKET_NAME"
 
           REPORT_FILE=$(find prowler-output -name "*.html" | head -n 1)
 
           aws s3 cp "$REPORT_FILE" \
-            "s3://$PROWLER_REPORTS_BUCKET/prowler/index.html" \
+            "s3://$ADM_BUCKET_NAME/prowler/index.html" \
             --content-type "text/html"
+
+          

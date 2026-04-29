@@ -68,7 +68,7 @@ resource "aws_iam_policy" "prowler_report_writer" {
         Action = [
           "s3:PutObject"
         ]
-        Resource = "${aws_s3_bucket.prowler_reports.arn}/prowler/*"
+        Resource = "${aws_s3_bucket.adm_reports.arn}/prowler/*"
       }
     ]
   })
@@ -83,7 +83,7 @@ resource "aws_iam_role_policy_attachment" "prowler_report_writer_attach" {
   policy_arn = aws_iam_policy.prowler_report_writer.arn
 }
 
-data "aws_iam_policy_document" "prowler_reports_bucket_policy" {
+data "aws_iam_policy_document" "admbucket_policy" {
   statement {
     sid    = "AWSCloudTrailAclCheck"
     effect = "Allow"
@@ -98,7 +98,7 @@ data "aws_iam_policy_document" "prowler_reports_bucket_policy" {
     ]
 
     resources = [
-      aws_s3_bucket.prowler_reports.arn
+      aws_s3_bucket.adm_reports.arn
     ]
   }
 
@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "prowler_reports_bucket_policy" {
     ]
 
     resources = [
-      "${aws_s3_bucket.prowler_reports.arn}/cloudtrail/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+      "${aws_s3_bucket.adm_reports.arn}/cloudtrail/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
     ]
 
     condition {
@@ -127,7 +127,7 @@ data "aws_iam_policy_document" "prowler_reports_bucket_policy" {
   }
 }
 
-resource "aws_s3_bucket_policy" "prowler_reports" {
-  bucket = aws_s3_bucket.prowler_reports.id
-  policy = data.aws_iam_policy_document.prowler_reports_bucket_policy.json
+resource "aws_s3_bucket_policy" "adm_reports" {
+  bucket = aws_s3_bucket.adm_reports.id
+  policy = data.aws_iam_policy_document.admbucket_policy.json
 }

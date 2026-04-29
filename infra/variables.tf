@@ -44,8 +44,8 @@ variable "ec2_instance_count" {
   default     = 2
 }
 
-variable "prowler_reports_bucket_name" {
-  description = "Nome do bucket S3 para relatórios do Prowler"
+variable "adm_bucket_name" {
+  description = "Nome do bucket S3 para relatórios do Prowler e Logs Cloudtrail"
   type        = string
   default     = "cloudsec-tmmuniz-prowler-bucket"
 }
