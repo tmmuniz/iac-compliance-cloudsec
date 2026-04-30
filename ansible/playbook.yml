@@ -1,5 +1,6 @@
 - name: Configure CloudSec web instances via SSM
   hosts: role_web
+  serial: 1
   become: true
   gather_facts: false
 

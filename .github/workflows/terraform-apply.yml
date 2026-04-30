@@ -104,7 +104,7 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
       ADM_BUCKET_NAME: ${{ vars.ADM_BUCKET_NAME }}
       APP_BUCKET_NAME: ${{ needs.apply.outputs.app_bucket_name }}
-      ANSIBLE_TIMEOUT: "60"
+      ANSIBLE_TIMEOUT: "90"
       ANSIBLE_HOST_KEY_CHECKING: "False"
 
     steps:
@@ -141,7 +141,7 @@ jobs:
         run: |
           ansible-playbook \
             -i ansible/inventory.aws_ec2.yml \
-            ansible/playbook.yml
+            ansible/playbook.yml -f 1
             
   prowler:
     if: false
