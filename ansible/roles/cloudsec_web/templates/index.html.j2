@@ -1,0 +1,33 @@
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Language" content="pt-BR">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudSec Free Tier Lab</title>
+  </head>
+  <body>
+    <h1>CloudSec Free Tier Lab</h1>
+
+    <p>Ambiente criado com Terraform, Ansible via SSM, Rego, tfsec, Prowler, CloudTrail, EC2, ALB, IAM e S3.</p>
+
+    <h2>Instância atual</h2>
+    <ul>
+      <li><strong>Hostname:</strong> {{ ansible_hostname }}</li>
+      <li><strong>Private IP:</strong> {{ ansible_default_ipv4.address | default('N/A') }}</li>
+      <li><strong>Sistema:</strong> {{ ansible_distribution }} {{ ansible_distribution_version }}</li>
+    </ul>
+
+    <h2>Controles aplicados</h2>
+    <ul>
+      <li>Configuração realizada por Ansible via AWS Systems Manager Session Manager.</li>
+      <li>Sem SSH e sem porta 22 aberta.</li>
+      <li>Nginx com headers básicos de segurança.</li>
+      <li>EC2 escreve e lê apenas no bucket privado da aplicação.</li>
+      <li>Bucket administrativo usado para Prowler, CloudTrail e transporte temporário do Ansible.</li>
+    </ul>
+
+    <p>
+      <a href="/app-data/index.html">Ver dados escritos no bucket da aplicação</a>
+    </p>
+  </body>
+</html>

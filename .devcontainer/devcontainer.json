@@ -9,7 +9,9 @@
     "vscode": {
       "extensions": [
         "hashicorp.terraform",
-        "tsandall.opa"
+        "tsandall.opa",
+        "ecmel.vscode-html-css",
+        "redhat.ansible"
       ]
     }
   }

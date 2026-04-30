@@ -1,0 +1,59 @@
+#!/bin/bash
+set -euo pipefail
+
+APP_BUCKET="{{ app_bucket }}"
+OUTPUT_DIR="/usr/share/nginx/html/app-data"
+
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/instance-id)
+
+HOSTNAME=$(hostname)
+NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+OBJECT_KEY="ec2-writes/$INSTANCE_ID-output.txt"
+
+mkdir -p "$OUTPUT_DIR"
+
+cat > /tmp/ec2-app-write.txt <<EOT
+CloudSec Free Tier Lab
+Instance ID: $INSTANCE_ID
+Hostname: $HOSTNAME
+Timestamp UTC: $NOW
+Bucket: $APP_BUCKET
+EOT
+
+aws s3 cp /tmp/ec2-app-write.txt "s3://$APP_BUCKET/$OBJECT_KEY"
+
+aws s3 ls "s3://$APP_BUCKET/ec2-writes/" > "$OUTPUT_DIR/objects.txt" || true
+
+cat > "$OUTPUT_DIR/index.html" <<EOT
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Language" content="pt-BR">
+    <title>Leitura do bucket da aplicação</title>
+  </head>
+  <body>
+    <h1>Leitura do bucket da aplicação</h1>
+
+    <ul>
+      <li><strong>Bucket:</strong> $APP_BUCKET</li>
+      <li><strong>Instância:</strong> $INSTANCE_ID</li>
+      <li><strong>Hostname:</strong> $HOSTNAME</li>
+      <li><strong>Última atualização UTC:</strong> $NOW</li>
+    </ul>
+
+    <h2>Objetos encontrados em ec2-writes/</h2>
+    <pre>$(cat "$OUTPUT_DIR/objects.txt")</pre>
+
+    <h2>Último conteúdo escrito por esta instância</h2>
+    <pre>$(cat /tmp/ec2-app-write.txt)</pre>
+
+    <p><a href="/">Voltar</a></p>
+  </body>
+</html>
+EOT
+
+rm -f /tmp/ec2-app-write.txt

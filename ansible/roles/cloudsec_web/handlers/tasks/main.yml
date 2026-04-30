@@ -1,0 +1,74 @@
+- name: Install required packages
+  ansible.builtin.dnf:
+    name:
+      - nginx
+      - awscli
+      - cronie
+      - curl
+    state: present
+
+- name: Enable and start crond
+  ansible.builtin.systemd:
+    name: crond
+    enabled: true
+    state: started
+
+- name: Create app-data directory
+  ansible.builtin.file:
+    path: /usr/share/nginx/html/app-data
+    state: directory
+    owner: root
+    group: nginx
+    mode: "0750"
+
+- name: Remove default nginx index
+  ansible.builtin.file:
+    path: /usr/share/nginx/html/index.html
+    state: absent
+
+- name: Remove default nginx config
+  ansible.builtin.file:
+    path: /etc/nginx/conf.d/default.conf
+    state: absent
+
+- name: Deploy nginx config
+  ansible.builtin.template:
+    src: cloudsec-nginx.conf.j2
+    dest: /etc/nginx/conf.d/cloudsec.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nginx
+
+- name: Deploy main HTML page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /usr/share/nginx/html/index.html
+    owner: root
+    group: nginx
+    mode: "0640"
+
+- name: Deploy S3 write/read script
+  ansible.builtin.template:
+    src: write-and-read-app-bucket.sh.j2
+    dest: /usr/local/bin/write-and-read-app-bucket.sh
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Create cron job
+  ansible.builtin.cron:
+    name: "Write and read app bucket"
+    minute: "*/5"
+    user: root
+    job: "/usr/local/bin/write-and-read-app-bucket.sh"
+
+- name: Execute S3 script once
+  ansible.builtin.command: /usr/local/bin/write-and-read-app-bucket.sh
+  changed_when: true
+
+- name: Enable and start nginx
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: true
+    state: started
