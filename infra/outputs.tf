@@ -1,6 +1,6 @@
 output "app_bucket_name" {
   description = "Nome do bucket S3 criado para o laboratório."
-  value       = module.cloudsec_lab.bucket_name
+  value       = module.cloudsec_lab.app_bucket_name
 }
 
 output "adm_bucket_name" {
