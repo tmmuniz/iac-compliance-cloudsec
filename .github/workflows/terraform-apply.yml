@@ -103,6 +103,12 @@ jobs:
         with:
           role-to-assume: ${{ vars.ARN_OIDC_ANSIBLE_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Validate ADM bucket access
+        run: |
+          aws sts get-caller-identity
+          aws s3api head-bucket --bucket "$ADM_BUCKET_NAME"
+          aws s3api get-bucket-location --bucket "$ADM_BUCKET_NAME"
 
       - name: Install Ansible and AWS dependencies
         run: |

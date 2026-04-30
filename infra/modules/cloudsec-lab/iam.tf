@@ -205,6 +205,15 @@ resource "aws_iam_policy" "ansible_ssm_controller" {
           "s3:DeleteObject"
         ]
         Resource = "${aws_s3_bucket.adm_reports.arn}/ansible-ssm/*"
+      },
+      {
+        Sid    = "AllowAnsibleSSMBucketAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:ListBucket"
+        ]
+        Resource = aws_s3_bucket.adm_reports.arn
       }
     ]
   })
