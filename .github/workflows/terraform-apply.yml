@@ -103,6 +103,7 @@ jobs:
     env:
       AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
       ADM_BUCKET_NAME: ${{ vars.ADM_BUCKET_NAME }}
+      APP_BUCKET_NAME: ${{ needs.apply.outputs.app_bucket_name }}
       ANSIBLE_TIMEOUT: "60"
       ANSIBLE_HOST_KEY_CHECKING: "False"
 
