@@ -165,6 +165,16 @@ resource "aws_iam_policy" "ansible_ssm_controller" {
         }
       },
       {
+        Sid    = "AllowStartSessionUsingSessionManagerDocument"
+        Effect = "Allow"
+        Action = [
+          "ssm:StartSession"
+        ]
+        Resource = [
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/SSM-SessionManagerRunShell"
+        ]
+      },
+      {
         Sid    = "AllowManageOwnSessions"
         Effect = "Allow"
         Action = [
