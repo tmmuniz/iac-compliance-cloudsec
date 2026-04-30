@@ -11,5 +11,6 @@ module "cloudsec_lab" {
   enable_ssh_access      = var.enable_ssh_access
   force_destroy_buckets  = var.force_destroy_buckets
   ssh_public_key         = var.ssh_public_key
-  aws_region = var.aws_region
+  aws_region             = var.aws_region
+  ansible_role_name      = var.ansible_role_name
 }

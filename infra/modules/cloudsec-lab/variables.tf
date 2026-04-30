@@ -76,3 +76,9 @@ variable "aws_region" {
   type    = string
   default = "us-east-1"
 }
+
+variable "ansible_role_name" {
+  description = "Nome da role OIDC usada pelo GitHub Actions para Ansible"
+  type        = string
+}
+

@@ -11,12 +11,15 @@ permissions:
   id-token: write
 
 env:
-  TF_VAR_allowed_public_ip_cidr: ${{ vars.ALLOWED_PUBLIC_IP_CIDR }}
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  ADM_BUCKET_NAME: ${{ vars.ADM_BUCKET_NAME }}
+
+  TF_VAR_allowed_public_ip_cidr: ${{ vars.ALLOWED_PUBLIC_IP_CIDR }}
+  TF_VAR_ssh_public_key: ${{ vars.SSH_PUB_KEY }}
   TF_VAR_adm_bucket_name: ${{ vars.ADM_BUCKET_NAME }}
   TF_VAR_github_repository: ${{ github.repository }}
-  ADM_BUCKET_NAME: ${{ vars.ADM_BUCKET_NAME }}
-  TF_VAR_ssh_public_key: ${{ vars.SSH_PUB_KEY }}
+  TF_VAR_ansible_role_name: ${{ vars.ARN_OIDC_ANSIBLE_ROLE }}
+  
 
 jobs:
   plan:

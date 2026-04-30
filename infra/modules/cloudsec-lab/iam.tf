@@ -135,3 +135,88 @@ resource "aws_s3_bucket_policy" "adm_reports" {
   bucket = aws_s3_bucket.adm_reports.id
   policy = data.aws_iam_policy_document.adm_bucket_policy.json
 }
+
+data "aws_iam_role" "ansible_role" {
+  name = var.ansible_role_name
+}
+
+resource "aws_iam_policy" "ansible_ssm_controller" {
+  name = "${local.name_prefix}-ansible-ssm-controller"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowStartSessionToCloudSecInstances"
+        Effect = "Allow"
+        Action = [
+          "ssm:StartSession"
+        ]
+        Resource = [
+          "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:instance/*",
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/AWS-StartSSHSession",
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/AWS-StartInteractiveCommand"
+        ]
+        Condition = {
+          StringEquals = {
+            "ssm:resourceTag/Project"     = var.project_name
+            "ssm:resourceTag/Environment" = var.environment
+            "ssm:resourceTag/Role"        = "web"
+          }
+        }
+      },
+      {
+        Sid    = "AllowManageOwnSessions"
+        Effect = "Allow"
+        Action = [
+          "ssm:TerminateSession",
+          "ssm:ResumeSession"
+        ]
+        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:session/$${aws:userid}-*"
+      },
+      {
+        Sid    = "AllowDescribeInstances"
+        Effect = "Allow"
+        Action = [
+          "ssm:DescribeInstanceInformation",
+          "ec2:DescribeInstances",
+          "ec2:DescribeTags"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowListBucketAnsiblePrefix"
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = aws_s3_bucket.adm_reports.arn
+        Condition = {
+          StringLike = {
+            "s3:prefix" = ["ansible-ssm/*"]
+          }
+        }
+      },
+      {
+        Sid    = "AllowAnsibleObjects"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${aws_s3_bucket.adm_reports.arn}/ansible-ssm/*"
+      }
+    ]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-ansible-ssm-controller"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ansible_policy" {
+  role       = data.aws_iam_role.ansible_role.name
+  policy_arn = aws_iam_policy.ansible_ssm_controller.arn
+}
+
