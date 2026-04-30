@@ -1,30 +1,11 @@
-- name: Clean DNF metadata
-  ansible.builtin.command: dnf clean all
-  changed_when: false
-
-- name: Rebuild DNF cache
-  ansible.builtin.command: dnf makecache
-  changed_when: false
-
 - name: Install required packages
-  ansible.builtin.command: dnf install -y nginx awscli cronie curl
-  changed_when: true
-
-- name: Validate installed packages
-  ansible.builtin.command: rpm -q nginx awscli cronie curl
-  changed_when: false
-
-- name: Enable and start nginx
-  ansible.builtin.systemd:
-    name: nginx
-    enabled: true
-    state: started
-
-- name: Enable and start crond
-  ansible.builtin.systemd:
-    name: crond
-    enabled: true
-    state: started
+  ansible.builtin.dnf:
+    name:
+      - nginx
+      - awscli
+      - cronie
+    state: present
+    update_cache: true
 
 - name: Create app-data directory
   ansible.builtin.file:
@@ -76,9 +57,9 @@
     user: root
     job: "/usr/local/bin/write-and-read-app-bucket.sh"
 
-- name: Execute S3 script once
-  ansible.builtin.command: /usr/local/bin/write-and-read-app-bucket.sh
-  changed_when: true
+#- name: Execute S3 script once
+#  ansible.builtin.command: /usr/local/bin/write-and-read-app-bucket.sh
+#  changed_when: true
 
 - name: Enable and start nginx
   ansible.builtin.systemd:

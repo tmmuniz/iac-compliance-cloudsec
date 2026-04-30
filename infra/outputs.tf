@@ -1,4 +1,4 @@
-output "bucket_name" {
+output "app_bucket_name" {
   description = "Nome do bucket S3 criado para o laboratório."
   value       = module.cloudsec_lab.bucket_name
 }

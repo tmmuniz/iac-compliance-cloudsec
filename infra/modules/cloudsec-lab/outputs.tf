@@ -1,4 +1,4 @@
-output "bucket_name" {
+output "app_bucket_name" {
   description = "Nome do bucket S3 privado do laboratório."
   value       = aws_s3_bucket.app_data.bucket
 }

@@ -81,6 +81,16 @@ jobs:
       - name: Terraform apply
         run: terraform apply -auto-approve tfplan.binary
 
+      - name: Get Terraform outputs
+        id: tf_outputs
+        working-directory: infra
+        run: |
+          APP_BUCKET_NAME=$(terraform output -raw app_bucket_name)
+          echo "app_bucket_name=$APP_BUCKET_NAME" >> $GITHUB_OUTPUT
+
+    outputs:
+      app_bucket_name: ${{ steps.tf_outputs.outputs.app_bucket_name }}
+
   ansible:
     name: Configure EC2 with Ansible over SSM
     runs-on: ubuntu-latest

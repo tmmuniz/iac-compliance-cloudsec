@@ -4,7 +4,7 @@
   gather_facts: false
 
   vars:
-    adm_bucket: "{{ lookup('env', 'ADM_BUCKET_NAME') }}"
+    app_bucket: "{{ lookup('env', 'APP_BUCKET_NAME') }}"
 
   roles:
     - cloudsec_web

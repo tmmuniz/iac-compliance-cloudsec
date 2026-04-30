@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-ADM_BUCKET="{{ adm_bucket }}"
+APP_BUCKET="{{ app_bucket }}"
 OUTPUT_DIR="/usr/share/nginx/html/app-data"
 
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
@@ -24,9 +24,9 @@ Timestamp UTC: $NOW
 Bucket: $ADM_BUCKET
 EOT
 
-aws s3 cp /tmp/ec2-app-write.txt "s3://$ADM_BUCKET/$OBJECT_KEY"
+aws s3 cp /tmp/ec2-app-write.txt "s3://$APP_BUCKET/$OBJECT_KEY"
 
-aws s3 ls "s3://$ADM_BUCKET/ec2-writes/" > "$OUTPUT_DIR/objects.txt" || true
+aws s3 ls "s3://$APP_BUCKET/ec2-writes/" > "$OUTPUT_DIR/objects.txt" || true
 
 cat > "$OUTPUT_DIR/index.html" <<EOT
 <html lang="pt-BR">
