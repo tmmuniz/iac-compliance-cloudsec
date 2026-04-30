@@ -135,6 +135,10 @@ data "aws_iam_role" "ansible_role" {
   name = local.ansible_role_name
 }
 
+data "aws_iam_role" "prowler_role" {
+  name = local.prowler_role_name
+}
+
 resource "aws_iam_policy" "ansible_ssm_controller" {
   name = "${local.name_prefix}-ansible-ssm-controller"
 
