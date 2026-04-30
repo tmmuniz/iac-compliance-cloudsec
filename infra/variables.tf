@@ -76,3 +76,8 @@ variable "ansible_role_arn" {
   description = "ARN da role OIDC usada pelo GitHub Actions para Ansible"
   type        = string
 }
+
+variable "prowler_role_arn" {
+  description = "ARN da role OIDC usada pelo GitHub Actions para Prowler"
+  type        = string
+}

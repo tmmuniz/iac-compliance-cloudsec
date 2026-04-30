@@ -13,4 +13,5 @@ module "cloudsec_lab" {
   ssh_public_key         = var.ssh_public_key
   aws_region             = var.aws_region
   ansible_role_arn       = var.ansible_role_arn
+  prowler_role_arn       = var.prowler_role_arn
 }

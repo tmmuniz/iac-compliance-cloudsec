@@ -82,11 +82,6 @@ resource "aws_iam_policy" "prowler_report_writer" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "prowler_report_writer_attach" {
-  role       = var.adm_role_name
-  policy_arn = aws_iam_policy.prowler_report_writer.arn
-}
-
 data "aws_iam_policy_document" "adm_bucket_policy" {
   statement {
     sid    = "AWSCloudTrailAclCheck"
@@ -220,3 +215,7 @@ resource "aws_iam_role_policy_attachment" "attach_ansible_policy" {
   policy_arn = aws_iam_policy.ansible_ssm_controller.arn
 }
 
+resource "aws_iam_role_policy_attachment" "prowler_report_writer_attach" {
+  role       = data.aws_iam_role.prowler_role.name
+  policy_arn = aws_iam_policy.prowler_report_writer.arn
+}

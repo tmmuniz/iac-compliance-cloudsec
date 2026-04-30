@@ -49,12 +49,6 @@ variable "github_repository" {
   default     = "tmmuniz/iac-compliance-cloudsec"
 }
 
-variable "adm_role_name" {
-  description = "Nome da role IAM criada manualmente para o Prowler"
-  type        = string
-  default     = "github-actions-adm-role"
-}
-
 variable "ssh_public_key" {
   description = "Chave pública SSH para acesso às instâncias"
   type        = string
@@ -78,6 +72,11 @@ variable "aws_region" {
 }
 
 variable "ansible_role_arn" {
+  description = "ARN da role OIDC usada pelo GitHub Actions para Ansible"
+  type        = string
+}
+
+variable "prowler_role_arn" {
   description = "ARN da role OIDC usada pelo GitHub Actions para Ansible"
   type        = string
 }
