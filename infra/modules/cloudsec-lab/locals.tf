@@ -5,6 +5,7 @@ locals {
     Owner       = var.owner
   }
 
-  name_prefix = "${var.project_name}-${var.environment}"
-  bucket_name = lower("${local.name_prefix}-${data.aws_caller_identity.current.account_id}")
+  name_prefix       = "${var.project_name}-${var.environment}"
+  bucket_name       = lower("${local.name_prefix}-${data.aws_caller_identity.current.account_id}")
+  ansible_role_name = regex("[^/]+$", var.ansible_role_arn)
 }

@@ -137,7 +137,7 @@ resource "aws_s3_bucket_policy" "adm_reports" {
 }
 
 data "aws_iam_role" "ansible_role" {
-  name = var.ansible_role_name
+  name = local.ansible_role_name
 }
 
 resource "aws_iam_policy" "ansible_ssm_controller" {

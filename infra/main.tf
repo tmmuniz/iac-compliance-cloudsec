@@ -12,5 +12,5 @@ module "cloudsec_lab" {
   force_destroy_buckets  = var.force_destroy_buckets
   ssh_public_key         = var.ssh_public_key
   aws_region             = var.aws_region
-  ansible_role_name      = var.ansible_role_name
+  ansible_role_arn       = var.ansible_role_arn
 }

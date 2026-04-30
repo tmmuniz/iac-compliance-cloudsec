@@ -72,7 +72,7 @@ variable "force_destroy_buckets" {
   default     = false
 }
 
-variable "ansible_role_name" {
-  description = "Nome da role OIDC usada pelo GitHub Actions para Ansible"
+variable "ansible_role_arn" {
+  description = "ARN da role OIDC usada pelo GitHub Actions para Ansible"
   type        = string
 }
