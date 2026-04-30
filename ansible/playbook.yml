@@ -1,7 +1,7 @@
 - name: Configure CloudSec web instances via SSM
   hosts: role_web
   become: true
-  gather_facts: true
+  gather_facts: false
 
   vars:
     adm_bucket: "{{ lookup('env', 'ADM_BUCKET_NAME') }}"

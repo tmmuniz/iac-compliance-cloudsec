@@ -93,6 +93,8 @@ jobs:
     env:
       AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
       ADM_BUCKET_NAME: ${{ vars.ADM_BUCKET_NAME }}
+      ANSIBLE_TIMEOUT: "60"
+      ANSIBLE_HOST_KEY_CHECKING: "False"
 
     steps:
       - name: Checkout repository
