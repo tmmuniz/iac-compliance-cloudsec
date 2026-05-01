@@ -151,15 +151,13 @@ resource "aws_iam_policy" "ansible_ssm_controller" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowStartSessionToCloudSecInstances"
+        Sid    = "AllowStartSessionToTaggedCloudSecInstances"
         Effect = "Allow"
         Action = [
           "ssm:StartSession"
         ]
         Resource = [
-          "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:instance/*",
-          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/AWS-StartSSHSession",
-          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/AWS-StartInteractiveCommand"
+          "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:instance/*"
         ]
         Condition = {
           StringEquals = {
@@ -170,13 +168,15 @@ resource "aws_iam_policy" "ansible_ssm_controller" {
         }
       },
       {
-        Sid    = "AllowStartSessionUsingSessionManagerDocument"
+        Sid    = "AllowStartSessionUsingRequiredDocuments"
         Effect = "Allow"
         Action = [
           "ssm:StartSession"
         ]
         Resource = [
-          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/SSM-SessionManagerRunShell"
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/SSM-SessionManagerRunShell",
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/AWS-StartSSHSession",
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:document/AWS-StartInteractiveCommand"
         ]
       },
       {
@@ -189,7 +189,7 @@ resource "aws_iam_policy" "ansible_ssm_controller" {
         Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:session/$${aws:userid}-*"
       },
       {
-        Sid    = "AllowDescribeInstances"
+        Sid    = "AllowDescribeForInventory"
         Effect = "Allow"
         Action = [
           "ssm:DescribeInstanceInformation",
@@ -199,20 +199,24 @@ resource "aws_iam_policy" "ansible_ssm_controller" {
         Resource = "*"
       },
       {
-        Sid    = "AllowListBucketAnsiblePrefix"
+        Sid    = "AllowAdmBucketMetadataAndListAnsiblePrefix"
         Effect = "Allow"
         Action = [
+          "s3:GetBucketLocation",
           "s3:ListBucket"
         ]
         Resource = aws_s3_bucket.adm_reports.arn
         Condition = {
           StringLike = {
-            "s3:prefix" = ["ansible-ssm/*"]
+            "s3:prefix" = [
+              "ansible-ssm",
+              "ansible-ssm/*"
+            ]
           }
         }
       },
       {
-        Sid    = "AllowAnsibleObjects"
+        Sid    = "AllowAnsibleSSMTempObjects"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
@@ -220,15 +224,6 @@ resource "aws_iam_policy" "ansible_ssm_controller" {
           "s3:DeleteObject"
         ]
         Resource = "${aws_s3_bucket.adm_reports.arn}/ansible-ssm/*"
-      },
-      {
-        Sid    = "AllowAnsibleSSMBucketAccess"
-        Effect = "Allow"
-        Action = [
-          "s3:GetBucketLocation",
-          "s3:ListBucket"
-        ]
-        Resource = aws_s3_bucket.adm_reports.arn
       }
     ]
   })

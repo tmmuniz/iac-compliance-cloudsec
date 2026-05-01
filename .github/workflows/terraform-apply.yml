@@ -38,59 +38,59 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      #- name: Configure AWS credentials with OIDC
-      #  uses: aws-actions/configure-aws-credentials@v4
-      #  with:
-      #    role-to-assume: ${{ vars.ARN_OIDC_TERRAFORM_ROLE }}
-      #    aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.ARN_OIDC_TERRAFORM_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      #- name: Setup Terraform
-      #  uses: hashicorp/setup-terraform@v3
-      #  with:
-      #    terraform_version: 1.8.5
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
 
-      #- name: Setup OPA
-      #  uses: open-policy-agent/setup-opa@v2
-      #  with:
-      #    version: latest
+      - name: Setup OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: latest
 
-      #- name: Terraform init
-      #  run: terraform init -input=false -reconfigure
+      - name: Terraform init
+        run: terraform init -input=false -reconfigure
 
-      #- name: Terraform fmt
-      #  run: terraform fmt -recursive
+      - name: Terraform fmt
+        run: terraform fmt -recursive
 
-      #- name: Terraform validate
-      #  run: terraform validate
+      - name: Terraform validate
+        run: terraform validate
 
-      #- name: Terraform plan
-      #  run: terraform plan -out=tfplan.binary
+      - name: Terraform plan
+        run: terraform plan -out=tfplan.binary
 
-      #- name: Convert plan to JSON
-      #  run: terraform show -json tfplan.binary > tfplan.json
+      - name: Convert plan to JSON
+        run: terraform show -json tfplan.binary > tfplan.json
 
-      #- name: Run Rego security policies before apply
-      #  run: |
-      #    opa eval \
-      #      --fail-defined \
-      #      --format pretty \
-      #      --data ../policy/terraform_security.rego \
-      #      --input tfplan.json \
-      #      'data.terraform.security.deny[_]'
+      - name: Run Rego security policies before apply
+        run: |
+          opa eval \
+            --fail-defined \
+            --format pretty \
+            --data ../policy/terraform_security.rego \
+            --input tfplan.json \
+            'data.terraform.security.deny[_]'
 
-      #- name: Terraform apply
-      #  run: terraform apply -auto-approve tfplan.binary
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan.binary
 
-      #- name: Get Terraform outputs
-      #  id: tf_outputs
-      #  working-directory: infra
-      #  run: |
-      #    APP_BUCKET_NAME=$(terraform output -raw app_bucket_name)
-      #    echo "app_bucket_name=$APP_BUCKET_NAME" >> $GITHUB_OUTPUT
+      - name: Get Terraform outputs
+        id: tf_outputs
+        working-directory: infra
+        run: |
+          APP_BUCKET_NAME=$(terraform output -raw app_bucket_name)
+          echo "app_bucket_name=$APP_BUCKET_NAME" >> $GITHUB_OUTPUT
 
     outputs:
-      #app_bucket_name: ${{ steps.tf_outputs.outputs.app_bucket_name }}
-      app_bucket_name: "cloudsec-freetier-dev-362552859209"
+      app_bucket_name: ${{ steps.tf_outputs.outputs.app_bucket_name }}
+      #app_bucket_name: "cloudsec-freetier-dev-362552859209"
   ansible:
     name: Configure EC2 with Ansible over SSM
     runs-on: ubuntu-latest
