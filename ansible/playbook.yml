@@ -10,10 +10,10 @@
     # Melhora a estabilidade em conexões instáveis/SSM
     ansible_ssh_pipelining: true 
 
-  pre_tasks:
-    - name: Ensure sudo does not ask for password
-      ansible.builtin.command: sudo -n true
-      changed_when: false
+  #pre_tasks:
+  #  - name: Ensure sudo does not ask for password
+  #    ansible.builtin.command: sudo -n true
+  #    changed_when: false
   
   environment:
     # Garante modo não interativo globalmente
