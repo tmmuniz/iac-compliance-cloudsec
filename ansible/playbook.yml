@@ -1,6 +1,7 @@
 - name: Configure CloudSec web instances via SSM
   hosts: role_web
   become: true
+  gather_facts: false
   # Adicione esta variável para garantir que o SSH/SSM não espere entrada
   vars:
     ansible_ssh_extra_args: '-o BatchMode=yes -o StrictHostKeyChecking=no'
@@ -18,12 +19,6 @@
     # Garante modo não interativo globalmente
     DEBIAN_FRONTEND: noninteractive
     NEEDRESTART_MODE: a # Evita prompts de reinicialização de serviços no Debian/Ubuntu
-
-  pre_tasks:
-    - name: Validate Sudo access is non-interactive
-      ansible.builtin.command: sudo -n true
-      changed_when: false
-      check_mode: false
 
   roles:
     - cloudsec_web
