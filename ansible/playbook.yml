@@ -3,8 +3,6 @@
   serial: 1
   become: true
   gather_facts: false
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
 
 # Use pre_tasks para validar a conexão ANTES das roles tentarem rodar
   pre_tasks:
@@ -15,6 +13,7 @@
 
   vars:
     app_bucket: "{{ lookup('env', 'APP_BUCKET_NAME') }}"
+    ansible_python_interpreter: /usr/bin/python3
 
   roles:
     - cloudsec_web
