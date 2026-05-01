@@ -3,6 +3,8 @@
   serial: 1
   become: true
   gather_facts: false
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 # Use pre_tasks para validar a conexão ANTES das roles tentarem rodar
   pre_tasks:
