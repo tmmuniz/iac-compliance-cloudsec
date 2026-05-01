@@ -106,6 +106,8 @@ jobs:
       APP_BUCKET_NAME: ${{ needs.apply.outputs.app_bucket_name }}
       ANSIBLE_TIMEOUT: "90"
       ANSIBLE_HOST_KEY_CHECKING: "False"
+      PYTHONUNBUFFERED: "1"
+      ANSIBLE_SSH_RETRIES: "3"
 
     steps:
       - name: Checkout repository

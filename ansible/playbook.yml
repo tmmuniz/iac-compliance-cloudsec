@@ -9,3 +9,7 @@
 
   roles:
     - cloudsec_web
+
+    - name: Test SSM Sudo
+      ansible.builtin.raw: sudo -n dnf help
+      become: false
