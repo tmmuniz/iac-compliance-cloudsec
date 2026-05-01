@@ -1,14 +1,24 @@
 - name: Install required packages
-  ansible.builtin.dnf:
-    name:
-      - nginx
-      - awscli
-      - cronie
-    state: present
-    update_cache: true
-    # Força a aceitação de chaves GPG e evita prompts de confirmação
-    disable_gpg_check: no
-  become: true
+  ansible.builtin.shell: |
+    sudo dnf clean all
+    sudo dnf makecache --refresh
+    sudo dnf install -y nginx awscli cronie
+    rpm -q nginx awscli cronie
+  args:
+    executable: /bin/bash
+  changed_when: true
+
+#- name: Install required packages
+#  ansible.builtin.dnf:
+#    name:
+#      - nginx
+#      - awscli
+#      - cronie
+#    state: present
+#    update_cache: true
+#    # Força a aceitação de chaves GPG e evita prompts de confirmação
+#    disable_gpg_check: no
+#  become: true
 
 
 - name: Create app-data directory
