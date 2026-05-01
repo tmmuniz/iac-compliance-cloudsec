@@ -1,26 +1,14 @@
-#- name: Install required packages
-#  ansible.builtin.dnf:
-#    name:
-#      - nginx
-#      - awscli
-#      - cronie
-#    state: present
-#    update_cache: true
-#  become: true
 - name: Install required packages
-  apt:
-    name: "{{ item }}"
+  ansible.builtin.dnf:
+    name:
+      - nginx
+      - awscli
+      - cronie
     state: present
-    update_cache: yes
-    # Força o uso do apt-get para evitar prompts interativos
-    force_apt_get: yes
-  loop:
-    - nginx
-    - git
-    - python3-pip
-  # Define variáveis de ambiente para modo não interativo
-  environment:
-    DEBIAN_FRONTEND: noninteractive
+    update_cache: true
+    # Força a aceitação de chaves GPG e evita prompts de confirmação
+    disable_gpg_check: no
+  become: true
 
 
 - name: Create app-data directory

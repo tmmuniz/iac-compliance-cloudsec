@@ -1,14 +1,18 @@
 - name: Configure CloudSec web instances via SSM
   hosts: role_web
-  serial: 1
   become: true
-  gather_facts: true # Recomendado ativar para que o Ansible detecte a distro correta
-
+  # Adicione esta variável para garantir que o SSH/SSM não espere entrada
   vars:
+    ansible_ssh_extra_args: '-o BatchMode=yes -o StrictHostKeyChecking=no'
     app_bucket: "{{ lookup('env', 'APP_BUCKET_NAME') }}"
     ansible_python_interpreter: /usr/bin/python3
     # Melhora a estabilidade em conexões instáveis/SSM
     ansible_ssh_pipelining: true 
+
+  pre_tasks:
+    - name: Ensure sudo does not ask for password
+      ansible.builtin.command: sudo -n true
+      changed_when: false
   
   environment:
     # Garante modo não interativo globalmente
