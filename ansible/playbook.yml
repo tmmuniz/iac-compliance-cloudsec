@@ -4,12 +4,15 @@
   become: true
   gather_facts: false
 
+# Use pre_tasks para validar a conexão ANTES das roles tentarem rodar
+  pre_tasks:
+    - name: Test SSM Sudo
+      ansible.builtin.raw: sudo -n dnf help
+      changed_when: false
+      become: false  # O sudo já está no comando raw
+
   vars:
     app_bucket: "{{ lookup('env', 'APP_BUCKET_NAME') }}"
 
   roles:
     - cloudsec_web
-
-    - name: Test SSM Sudo
-      ansible.builtin.raw: sudo -n dnf help
-      become: false
