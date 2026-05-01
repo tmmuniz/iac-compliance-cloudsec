@@ -199,21 +199,13 @@ resource "aws_iam_policy" "ansible_ssm_controller" {
         Resource = "*"
       },
       {
-        Sid    = "AllowAdmBucketMetadataAndListAnsiblePrefix"
+        Sid    = "AllowAdmBucketMetadata"
         Effect = "Allow"
         Action = [
           "s3:GetBucketLocation",
           "s3:ListBucket"
         ]
         Resource = aws_s3_bucket.adm_reports.arn
-        Condition = {
-          StringLike = {
-            "s3:prefix" = [
-              "ansible-ssm",
-              "ansible-ssm/*"
-            ]
-          }
-        }
       },
       {
         Sid    = "AllowAnsibleSSMTempObjects"
