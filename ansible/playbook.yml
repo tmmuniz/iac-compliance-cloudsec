@@ -2,18 +2,24 @@
   hosts: role_web
   serial: 1
   become: true
-  gather_facts: false
-
-# Use pre_tasks para validar a conexão ANTES das roles tentarem rodar
-  pre_tasks:
-    - name: Test SSM Sudo
-      ansible.builtin.raw: sudo -n dnf help
-      changed_when: false
-      become: false  # O sudo já está no comando raw
+  gather_facts: true # Recomendado ativar para que o Ansible detecte a distro correta
 
   vars:
     app_bucket: "{{ lookup('env', 'APP_BUCKET_NAME') }}"
     ansible_python_interpreter: /usr/bin/python3
+    # Melhora a estabilidade em conexões instáveis/SSM
+    ansible_ssh_pipelining: true 
+  
+  environment:
+    # Garante modo não interativo globalmente
+    DEBIAN_FRONTEND: noninteractive
+    NEEDRESTART_MODE: a # Evita prompts de reinicialização de serviços no Debian/Ubuntu
+
+  pre_tasks:
+    - name: Validate Sudo access is non-interactive
+      ansible.builtin.command: sudo -n true
+      changed_when: false
+      check_mode: false
 
   roles:
     - cloudsec_web
